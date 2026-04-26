@@ -15,6 +15,8 @@ def route_after_classify(state: AgentState) -> str:
     After the classifier, decide whether to answer or short-circuit.
     """
     intent = state.get("intent", "ambiguous")
+    if intent == "greeting":
+        return "greeting"
     if intent == "out_of_scope":
         return "out_of_scope"
     if intent == "ambiguous" and state.get("intent_confidence", 0) < 0.5:

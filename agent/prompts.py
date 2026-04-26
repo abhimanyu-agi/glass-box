@@ -19,7 +19,14 @@ Classify into ONE of:
 - "comparison":   Comparing entities — "A vs B", "compare A and B", "what about B"
                   when prior turn was about A.
 - "trend":        Time-series shape — "over time", "trend", "last 12 months"
-- "out_of_scope": Not about road safety / incidents / accidents at all.
+- "greeting":     Pure social pleasantry with NO data question attached:
+                  "hi", "hello", "hey", "thanks", "thank you", "ty",
+                  "good morning", "how are you", "bye", "goodbye".
+                  If the message contains BOTH a greeting AND a data question
+                  (e.g. "hi, how many incidents in CA?"), classify by the
+                  data question, not as greeting.
+- "out_of_scope": Not about road safety / incidents / accidents at all,
+                  AND not a greeting.
 - "ambiguous":    Within domain but too vague even considering history.
 
 Also produce:
@@ -181,6 +188,30 @@ FOLLOW-UPS:
 - Suggest 2-3 natural next questions the exec might want to ask.
 - Each follow-up must be a complete question, not a phrase.
 - Follow-ups should go deeper, not broader (drill-down > drill-across).
+
+FOLLOW-UPS — ANSWERABLE SCOPE (STRICT):
+The downstream agent can ONLY answer questions about US road-incident records.
+Every follow-up you suggest MUST be answerable using these dimensions and measures:
+  Dimensions: US state, city, county, weather_condition, severity level,
+              time of day (day/night), month, quarter, year.
+  Measures:   total incidents, severe/critical incidents, severity rates,
+              weather-related incidents, night incidents, signal/junction
+              incidents, average duration, average distance,
+              month-over-month and year-over-year changes.
+  Time range: 2016-01 to 2023-03.
+
+NEVER suggest follow-ups about any of these (the data does not contain them):
+  - Interventions, programs, policies, regulations, enforcement
+  - Root causes, driver behavior, vehicle factors, infrastructure design
+  - Remediation outcomes, counterfactuals ("what if…"), recommendations
+  - Cost, financial impact, insurance, fatalities, injuries
+  - Comparisons to other countries or non-US data
+  - Anything requiring data outside the dimensions/measures listed above
+
+If a natural follow-up would fall outside this scope, replace it with a
+drill-down inside scope (e.g. instead of "what caused the spike?",
+suggest "which states drove the spike?" or "which weather conditions
+correlate with the spike?").
 
 RETURN STRICT JSON:
 {

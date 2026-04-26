@@ -6,6 +6,7 @@ This gives us one place to swap models, add retries, or track cost.
 """
 
 import os
+from functools import lru_cache
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -63,8 +64,15 @@ def chat_completion(
     return content, usage
 
 
+@lru_cache(maxsize=512)
 def embed(text: str) -> list[float]:
-    """Single-text embedding used by the retrieval node."""
+    """
+    Single-text embedding used by the retrieval node.
+
+    Cached per-process: the same question (starter buttons, follow-ups,
+    repeats across users) is a cache hit. Failures are not cached —
+    lru_cache only stores successful returns.
+    """
     response = _client.embeddings.create(
         model="text-embedding-3-small",
         input=[text],

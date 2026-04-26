@@ -17,6 +17,7 @@ Intent = Literal[
     "metric_lookup",      # "how many X in Y?"
     "comparison",         # "X vs Y" or "compare A and B"
     "trend",              # time-series-shaped questions
+    "greeting",           # pure pleasantry: "hi", "thanks", "bye"
     "out_of_scope",       # not about our domain
     "ambiguous",          # could match multiple meanings
 ]

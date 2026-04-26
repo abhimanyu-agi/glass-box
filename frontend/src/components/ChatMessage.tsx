@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Bot, User as UserIcon, ChevronRight, Code2 } from "lucide-react";
 import type { ChatTurn } from "@/hooks/useChatStream";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ interface Props {
   onFollowupClick?: (q: string) => void;
 }
 
-export default function ChatMessage({ turn, onFollowupClick }: Props) {
+function ChatMessage({ turn, onFollowupClick }: Props) {
   const isUser = turn.role === "user";
 
   return (
@@ -79,6 +79,8 @@ export default function ChatMessage({ turn, onFollowupClick }: Props) {
     </div>
   );
 }
+
+export default memo(ChatMessage);
 
 function SqlExpander({ sql }: { sql: string }) {
   const [open, setOpen] = useState(false);

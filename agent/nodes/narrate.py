@@ -90,7 +90,7 @@ def narrate(state: AgentState) -> AgentState:
     # Build a readable text preview for the model
     data_preview = preview_df.to_string(index=False, max_rows=MAX_PREVIEW_ROWS)
 
-    model = os.getenv("MODEL_NARRATOR", "gpt-4o")
+    model = os.getenv("MODEL_NARRATOR", "gpt-4o-mini")
 
     user_msg = NARRATOR_USER.format(
         question=question,

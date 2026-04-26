@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Bar,
   BarChart,
@@ -17,7 +18,7 @@ interface Props { chart: ChartPayload; }
 
 const BAR_COLORS = ["#4f46e5", "#6366f1", "#818cf8", "#a5b4fc", "#c7d2fe"];
 
-export default function InlineChart({ chart }: Props) {
+function InlineChart({ chart }: Props) {
   if (!chart.records || chart.records.length === 0) return null;
 
   // Auto-detect axes — first column is label, last numeric column is value
@@ -137,3 +138,5 @@ export default function InlineChart({ chart }: Props) {
     </div>
   );
 }
+
+export default memo(InlineChart);

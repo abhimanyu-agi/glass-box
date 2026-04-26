@@ -5,10 +5,11 @@ Cheap model (gpt-4o-mini) + structured JSON output.
 """
 
 import json
-from agent.state import AgentState
-from agent.llm import chat_completion
-from agent.prompts import CLASSIFIER_SYSTEM, CLASSIFIER_USER
 import os
+import threading
+from agent.state import AgentState
+from agent.llm import chat_completion, embed
+from agent.prompts import CLASSIFIER_SYSTEM, CLASSIFIER_USER
 
 
 def classify_intent(state: AgentState) -> AgentState:
@@ -18,6 +19,12 @@ def classify_intent(state: AgentState) -> AgentState:
     total_cost = state.get("total_cost_usd", 0.0)
 
     trace.append(f"[classify] input: {question!r} (history turns: {len(history)})")
+
+    # Pre-warm the embedding cache so retrieve_metadata is a cache hit.
+    # Overlaps the embed API call with the classifier LLM call below.
+    # Daemon thread + lru_cache on embed() means failures here just cause
+    # retrieve to embed normally (no extra error path to maintain).
+    threading.Thread(target=embed, args=(question,), daemon=True).start()
 
     model = os.getenv("MODEL_CLASSIFIER", "gpt-4o-mini")
 
@@ -56,7 +63,7 @@ def classify_intent(state: AgentState) -> AgentState:
         confidence = 0.0
         reasoning = f"Classifier output unparseable: {e}"
 
-    valid = {"metric_lookup", "comparison", "trend", "out_of_scope", "ambiguous"}
+    valid = {"metric_lookup", "comparison", "trend", "greeting", "out_of_scope", "ambiguous"}
     if intent not in valid:
         trace.append(f"[classify] INVALID_INTENT: {intent!r} → coerced to ambiguous")
         intent = "ambiguous"

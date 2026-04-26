@@ -5,6 +5,7 @@ This wraps the Phase 4 semantic search with graph-friendly structure.
 """
 
 import os
+from psycopg2.extras import RealDictCursor
 from agent.state import AgentState, RetrievedItem
 from agent.db import get_conn
 from agent.llm import embed
@@ -50,7 +51,7 @@ def retrieve_metadata(state: AgentState) -> AgentState:
     """
 
     items: list[RetrievedItem] = []
-    with get_conn(dict_cursor=True) as conn, conn.cursor() as cur:
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(sql, (q_emb_str, q_emb_str, top_k))
         for row in cur.fetchall():
             dist = float(row["distance"])

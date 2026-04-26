@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, Sparkles, RotateCcw, X } from "lucide-react";
 import { useChatStream } from "@/hooks/useChatStream";
 import { useRail } from "@/contexts/RailContext";
@@ -19,6 +19,14 @@ export default function AskAIRail() {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLInputElement>(null);
+
+  // Refs hold the live values so handleSend can stay reference-stable across
+  // keystrokes — otherwise React.memo on ChatMessage would be defeated by a
+  // new onFollowupClick prop on every input change.
+  const turnsRef = useRef(turns);
+  turnsRef.current = turns;
+  const streamingRef = useRef(streaming);
+  streamingRef.current = streaming;
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -61,19 +69,19 @@ export default function AskAIRail() {
     return () => document.removeEventListener("keydown", handler);
   }, [openRail, closeRail, railOpen]);
 
-  function handleSend(question: string) {
+  const handleSend = useCallback((question: string) => {
     const trimmed = question.trim();
-    if (!trimmed || streaming) return;
+    if (!trimmed || streamingRef.current) return;
 
     // Build history from prior turns (cap at last 6)
-    const history = turns
+    const history = turnsRef.current
       .slice(-6)
       .filter((t) => !t.error && t.content)
       .map((t) => ({ role: t.role, content: t.content }));
 
     send({ question: trimmed, history });
     setInput("");
-  }
+  }, [send]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -1,9 +1,8 @@
 """/auth/* — register, login, me."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field
-from streamlit import status
 
 from api.config import settings
 from api.dependencies import get_current_user

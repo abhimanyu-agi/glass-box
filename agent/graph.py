@@ -55,6 +55,30 @@ def out_of_scope_node(state: AgentState) -> AgentState:
     }
 
 
+def greeting_node(state: AgentState) -> AgentState:
+    """
+    Short-circuit node for greetings and pleasantries.
+    Skips SQL entirely — returns a warm response and starter suggestions.
+    """
+    trace = state.get("trace", [])
+    trace.append("[greeting] short-circuit response")
+
+    return {
+        "narrative": (
+            "Happy to help. I work with US road-safety data from 2016 to early 2023 — "
+            "incidents, severity, weather impact, and trends by state, city, and time. "
+            "What would you like to explore?"
+        ),
+        "suggested_followups": [
+            "How many severe incidents happened in California last year?",
+            "Which weather conditions cause the most severe accidents?",
+            "Show me the monthly trend of severe incidents",
+        ],
+        "chart_type": "none",
+        "trace": trace,
+    }
+
+
 def build_agent():
     """
     Compile the LangGraph. Returns a callable `graph.invoke(initial_state)`.
@@ -69,6 +93,7 @@ def build_agent():
     builder.add_node("repair_sql", repair_sql)
     builder.add_node("narrate", narrate)
     builder.add_node("out_of_scope", out_of_scope_node)
+    builder.add_node("greeting", greeting_node)
 
     # Entry
     builder.set_entry_point("classify")
@@ -77,7 +102,11 @@ def build_agent():
     builder.add_conditional_edges(
         "classify",
         route_after_classify,
-        {"retrieve": "retrieve", "out_of_scope": "out_of_scope"},
+        {
+            "retrieve": "retrieve",
+            "out_of_scope": "out_of_scope",
+            "greeting": "greeting",
+        },
     )
 
     # Linear middle section
@@ -94,8 +123,9 @@ def build_agent():
     # Repair loops back to execute
     builder.add_edge("repair_sql", "execute_sql")
 
-    # Both terminals
+    # Terminals
     builder.add_edge("narrate", END)
     builder.add_edge("out_of_scope", END)
+    builder.add_edge("greeting", END)
 
     return builder.compile()
