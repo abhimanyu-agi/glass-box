@@ -22,6 +22,9 @@ Glass Box was built to test a different thesis. Put a curated semantic layer bet
 ## Demo
 
 
+![Glass Box architecture diagram](cfi-ai-poc/docs/architecture.png)
+
+
 
 ## Key features
 
