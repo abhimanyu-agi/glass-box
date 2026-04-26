@@ -19,10 +19,11 @@ Most AI dashboard demos give an LLM raw schema access and pray. The LLM looks at
 Glass Box was built to test a different thesis. Put a curated semantic layer between the LLM and the database. 
 
 
-## Demo
+## Architecture Diagram
 
 
-![Glass Box architecture diagram](cfi-ai-poc/docs/architecture.png)
+<img width="680" height="920" alt="architecture" src="https://github.com/user-attachments/assets/28397b6c-2980-4c13-81e1-7daff4acfa54" />
+
 
 
 
