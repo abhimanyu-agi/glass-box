@@ -25,7 +25,9 @@ Glass Box was built to test a different thesis. Put a curated semantic layer bet
 <img width="680" height="920" alt="architecture" src="https://github.com/user-attachments/assets/28397b6c-2980-4c13-81e1-7daff4acfa54" />
 
 
+## Agent Workflow
 
+![Agent Workflow](LangGraph.jpg)
 
 ## Key features
 
